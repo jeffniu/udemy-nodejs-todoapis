@@ -30,6 +30,24 @@ app.get('/todos', (req, res) => {
   })
 })
 
+app.get('/todos/:id', (req, res) => {
+  if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+    res.status(400).send("bad id")
+  } else {
+    Todo.findById(req.params.id).then((todo) => {
+        if (todo) {
+          res.send({todo})
+        } else {
+          res.status(404).send("Id not found")
+        }
+    }, (e) => {
+        res.status(400).send(e)
+    }).catch((e) => {res.status(400).send(e)})
+  }
+}, (e) => {
+  res.status(400).send(e)
+})
+
 app.listen(3000, () => {
     console.log('Started on port 3000')
 })
