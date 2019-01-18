@@ -1,3 +1,6 @@
+require('./config/config.js')
+
+const _ = require('lodash')
 var express = require('express')
 var bodyParser = require('body-parser')
 var {mongoose} = require('./db/mongoose')
@@ -48,8 +51,26 @@ app.get('/todos/:id', (req, res) => {
   res.status(400).send(e)
 })
 
-app.listen(3000, () => {
-    console.log('Started on port 3000')
+app.delete('/todos/:id', (req, res) => {
+  if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+    res.status(400).send("bad id")
+  } else {
+    Todo.deleteOne({_id: req.params.id}).then((res) => {
+        if (res) {
+          res.send({result: res})
+        } else {
+          res.status(404).send("Id not found")
+        }
+    }, (e) => {
+        res.status(400).send(e)
+    }).catch((e) => {res.status(400).send(e)})
+  }
+}, (e) => {
+  res.status(400).send(e)
+})
+
+app.listen(process.env.PORT, () => {
+    console.log(`Started on port ${process.env.PORT}`)
 })
 
 module.exports = {app};
